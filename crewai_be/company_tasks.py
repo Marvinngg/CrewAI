@@ -1,7 +1,7 @@
 from crewai import Task
 from textwrap import dedent
 from job_manager import append_event
-from models import PositionInfo, PositionInfoList
+from models import CompanyAnalysisData, CompanyReport
 from utils.logging import logger
 import global_config  # 引用全局常量
 
@@ -18,8 +18,8 @@ class CompanyAnalysisTasks:
             description=dedent(global_config.company_analyse_searchTask.format(company_name=company_name)),
             agent=agent,
             callback=self.append_event_callback,
-            output_json=PositionInfo,
-            expected_output="A JSON object containing the researched information.",
+            output_json=CompanyAnalysisData,
+            expected_output="A JSON object containing financial reports, market data, business operations, and strategic positioning for the company.",
             async_execution=True
         )
 
@@ -29,8 +29,6 @@ class CompanyAnalysisTasks:
             agent=agent,
             context=[task],
             callback=self.append_event_callback,
-            expected_output="A JSON object containing the researched information and analyse.",
-            output_json=PositionInfoList
+            output_json=CompanyReport,
+            expected_output="A JSON object containing the researched information and analysis, including financial reports, market data, business operations, strategic positioning, and a detailed analysis.",
         )
-
-    

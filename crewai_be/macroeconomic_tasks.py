@@ -1,9 +1,10 @@
 from crewai import Task
 from textwrap import dedent
 from job_manager import append_event
-from models import PositionInfo, PositionInfoList
+from models import MacroEconomicData, MacroEconomicReport
 from utils.logging import logger
 import global_config
+
 class MacroEconomicTasks:
     def __init__(self, job_id):
         self.job_id = job_id
@@ -17,8 +18,8 @@ class MacroEconomicTasks:
             description=dedent(global_config.macroeconomy_analyse_searchTask.format(country=country)),
             agent=agent,
             callback=self.append_event_callback,
-            output_json=PositionInfo,
-            expected_output="A JSON object containing the researched information.",
+            output_json=MacroEconomicData,
+            expected_output="A JSON object containing the GDP, inflation rate, unemployment rate, interest rate, trade balance, and fiscal deficit for the country.",
             async_execution=True
         )
 
@@ -28,6 +29,6 @@ class MacroEconomicTasks:
             agent=agent,
             context=[task],
             callback=self.append_event_callback,
-            expected_output="A JSON object containing the researched information and analyse.",
-            output_json=PositionInfoList
+            output_json=MacroEconomicReport,
+            expected_output="A JSON object containing the researched information and analysis, including GDP, inflation rate, unemployment rate, interest rate, trade balance, fiscal deficit, and a detailed analysis.",
         )

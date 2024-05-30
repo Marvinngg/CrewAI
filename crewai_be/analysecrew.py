@@ -5,6 +5,8 @@ from industry_agents import IndustryAnalysisAgents
 from industry_tasks import IndustryAnalysisTasks
 from macroeconomic_agents import MacroeconomicAnalysisAgents
 from macroeconomic_tasks import MacroEconomicTasks
+from trip_agents import TripAgents
+from trip_tasks import TripTasks
 from job_manager import append_event
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
@@ -126,6 +128,48 @@ class MacroeconomicCrew:
             tasks=[collect_macroeconomic_task, analyze_task],
             verbose=True
         )
+
+    def kickoff(self):
+        if not self.crew:
+            append_event(self.job_id, "Crew not set up")
+            return "Crew not set up"
+
+        append_event(self.job_id, "Task Started")
+        try:
+            results = self.crew.kickoff()
+            append_event(self.job_id, "Task Complete")
+            return results
+        except Exception as e:
+            append_event(self.job_id, f"An error occurred: {e}")
+            return str(e)
+
+class TripPlannerCrew:
+    def __init__(self, job_id: str):
+        self.job_id = job_id
+        self.crew = None
+        self.llm = ChatOpenAI(model="gpt-4-turbo-preview")
+
+    def setup_crew(self, location:str,travelto:str,date:str,hobby:str):
+        agents = TripAgents()
+        tasks = TripTasks(job_id=self.job_id)
+
+        city_selector_agent = agents.city_selection_agent()
+        local_expert_agent = agents.local_expert()
+        travel_concierge_agent = agents.travel_concierge()
+    
+    # 在创建任务时传递 job_id 参数
+        identify_task = tasks.identify_task( city_selector_agent, location, travelto, date, hobby)
+        gather_task = tasks.gather_task( local_expert_agent, location, hobby, date)
+        plan_task = tasks.plan_task( travel_concierge_agent, location, hobby, date)
+    
+        self.crew = Crew(
+        agents=[
+        city_selector_agent, local_expert_agent, travel_concierge_agent
+      ],
+      tasks=[identify_task, gather_task, plan_task],
+      verbose=True
+    )
+
 
     def kickoff(self):
         if not self.crew:

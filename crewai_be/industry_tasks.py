@@ -1,7 +1,7 @@
 from crewai import Task
 from textwrap import dedent
 from job_manager import append_event
-from models import PositionInfo, PositionInfoList
+from models import IndustryData, IndustryReport
 from utils.logging import logger
 import global_config  # 引用全局常量
 
@@ -18,8 +18,8 @@ class IndustryAnalysisTasks:
             description=dedent(global_config.industry_analyse_searchTask.format(industry_name=industry_name)),
             agent=agent,
             callback=self.append_event_callback,
-            output_json=PositionInfoList,
-            expected_output="A JSON object containing the researched information.",
+            output_json=IndustryData,
+            expected_output="A JSON object containing the market size, growth rate, key players, competitive landscape, regulatory environment, and technological advancements for the industry.",
             async_execution=True
         )
 
@@ -29,6 +29,6 @@ class IndustryAnalysisTasks:
             agent=agent,
             context=[task],
             callback=self.append_event_callback,
-            expected_output="A JSON object containing the researched information and analyse.",
-            output_json=PositionInfo
+            output_json=IndustryReport,
+            expected_output="A JSON object containing the researched information and analysis, including market size, growth rate, key players, competitive landscape, regulatory environment, technological advancements, and a detailed analysis.",
         )
